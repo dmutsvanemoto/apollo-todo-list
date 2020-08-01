@@ -1,5 +1,5 @@
 {
-  "name": "apollo-todo-list",
+  "name": "apollo-todo-list-client",
   "version": "0.0.1",
   "description": "Apollo GraphQl Todo List",
   "private": true,
