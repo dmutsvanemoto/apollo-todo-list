@@ -28,7 +28,11 @@ const server = new ApolloServer({
   dataSources: () => ({
     launchAPI: new LaunchAPI(),
     userAPI: new UserAPI({ store })
-  })
+  }),
+  engine: {    
+    reportSchema: true,
+    variant: "current"
+  }
 });
 
 server.listen()
