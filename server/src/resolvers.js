@@ -18,7 +18,7 @@ module.exports = {
         // last item in _all_ results, then there are no more results after this
         hasMore: launches.length
           ? launches[launches.length - 1].cursor !==
-            allLaunches[allLaunches.length - 1].cursor
+          allLaunches[allLaunches.length - 1].cursor
           : false
       };
     },
@@ -30,7 +30,40 @@ module.exports = {
     login: async (_, { email }, { dataSources }) => {
       const user = await dataSources.userAPI.findOrCreateUser({ email });
       if (user) return Buffer.from(email).toString('base64');
-    }
+    },
+    bookTrips: async (_, { launchIds }, { dataSources }) => {
+      const results = await dataSources.userAPI.bookTrips({ launchIds });
+      const launches = await dataSources.launchAPI.getLaunchesByIds({
+        launchIds,
+      });
+
+      return {
+        success: results && results.length === launchIds.length,
+        message:
+          results.length === launchIds.length
+            ? 'trips booked successfully'
+            : `the following launches couldn't be booked: ${launchIds.filter(
+              id => !results.includes(id),
+            )}`,
+        launches,
+      };
+    },
+    cancelTrip: async (_, { launchId }, { dataSources }) => {
+      const result = await dataSources.userAPI.cancelTrip({ launchId });
+
+      if (!result)
+        return {
+          success: false,
+          message: 'failed to cancel trip',
+        };
+
+      const launch = await dataSources.launchAPI.getLaunchById({ launchId });
+      return {
+        success: true,
+        message: 'trip cancelled',
+        launches: [launch],
+      };
+    },
   },
   Mission: {
     // The default size is 'LARGE' if not provided
